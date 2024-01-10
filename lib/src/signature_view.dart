@@ -21,7 +21,8 @@ class StoryPainter extends StatelessWidget {
       key: control.painterKey,
       child: Stack(
         children: [
-          Image.memory(imageData ?? Uint8List.fromList([])),
+          if (imageData != null)
+            Image.memory(imageData ?? Uint8List.fromList([])),
           StoryPainterPaint(
             control: control,
             onSize: control.notifyDimension,
