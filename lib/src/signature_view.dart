@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,8 +10,10 @@ import 'utils.dart';
 
 class StoryPainter extends StatelessWidget {
   final StoryPainterControl control;
+  final Uint8List? imageData;
 
-  StoryPainter({Key? key, required this.control}) : super(key: key);
+  StoryPainter({Key? key, required this.control, this.imageData})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +21,7 @@ class StoryPainter extends StatelessWidget {
       key: control.painterKey,
       child: Stack(
         children: [
+          Image.memory(imageData ?? Uint8List.fromList([])),
           StoryPainterPaint(
             control: control,
             onSize: control.notifyDimension,
@@ -129,12 +134,8 @@ class _StoryPainterViewSvgState extends State<_StoryPainterViewSvg> {
   }
 
   void _parseData(String data) async {
-    if (data == null) {
-      drawable = null;
-    } else {
-      final parser = SvgParser();
-      drawable = await parser.parse(data);
-    }
+    final parser = SvgParser();
+    drawable = await parser.parse(data);
 
     setState(() {});
   }
