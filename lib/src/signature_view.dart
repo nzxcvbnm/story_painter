@@ -20,6 +20,7 @@ class StoryPainter extends StatelessWidget {
     return RepaintBoundary(
       key: control.painterKey,
       child: Stack(
+        fit: StackFit.expand,
         children: [
           if (imageData != null)
             Image.memory(imageData ?? Uint8List.fromList([])),
@@ -27,18 +28,19 @@ class StoryPainter extends StatelessWidget {
             control: control,
             onSize: control.notifyDimension,
           ),
-          GestureDetector(
-            onLongPressStart: (args) => control.startPath(args.localPosition),
-            onLongPressEnd: (args) => control.closePath(),
-            onLongPressMoveUpdate: (args) =>
-                control.alterPath(args.localPosition),
-            onTapUp: (args) => control.closePath(),
-            //onTapCancel: () => control.closePath(),
-            onTapDown: (args) => control.startPath(args.localPosition),
-            onScaleStart: (args) => control.startPath(args.localFocalPoint),
-            onScaleUpdate: (args) => control.alterPath(args.localFocalPoint),
-            onScaleEnd: (args) => control.closePath(),
-          ),
+          if (control.color != Colors.transparent)
+            GestureDetector(
+              onLongPressStart: (args) => control.startPath(args.localPosition),
+              onLongPressEnd: (args) => control.closePath(),
+              onLongPressMoveUpdate: (args) =>
+                  control.alterPath(args.localPosition),
+              onTapUp: (args) => control.closePath(),
+              //onTapCancel: () => control.closePath(),
+              onTapDown: (args) => control.startPath(args.localPosition),
+              onScaleStart: (args) => control.startPath(args.localFocalPoint),
+              onScaleUpdate: (args) => control.alterPath(args.localFocalPoint),
+              onScaleEnd: (args) => control.closePath(),
+            ),
         ],
       ),
     );
