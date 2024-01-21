@@ -106,7 +106,7 @@ class SinglePathState extends State<SinglePath> {
 
           if (widget.painterControl.color == Colors.transparent) {
             loop:
-            for (var path in paths) {
+            for (var path in paths.reversed) {
               if (path != null)
                 for (var point in path.points) {
                   if (press.distanceTo(point) <= 20) {
