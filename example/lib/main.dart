@@ -7,9 +7,11 @@ import 'package:story_painter/story_painter.dart';
 
 import 'dart:ui' as ui;
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -22,7 +24,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Home(),
     );
@@ -30,6 +32,8 @@ class _MyAppState extends State<MyApp> {
 }
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
   _HomeState createState() => _HomeState();
 }
@@ -52,13 +56,19 @@ class _HomeState extends State<Home> {
         title: const Text('story_painter'),
         actions: [
           IconButton(
-            icon: Icon(Icons.undo),
+            icon: const Icon(Icons.close),
+            onPressed: () async {
+              painterControl.clear();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.undo),
             onPressed: () async {
               painterControl.undo();
             },
           ),
           IconButton(
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
             onPressed: () async {
               ui.Image image = await painterControl.toImage(pixelRatio: 3.0);
               ByteData? byteData =

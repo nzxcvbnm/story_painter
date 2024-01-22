@@ -57,6 +57,11 @@ class StoryPainterPaintState extends State<StoryPainterPaint> {
     refreshState();
   }
 
+  void removeAll() {
+    pathWidgets.clear();
+    refreshState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(

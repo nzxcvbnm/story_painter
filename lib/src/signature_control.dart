@@ -581,6 +581,11 @@ class StoryPainterControl {
     pageState.removePath(index);
   }
 
+  void clear() {
+    _paths.clear();
+    pageState.removeAll();
+  }
+
   void setColor(Color newColor) => color = newColor;
 
   void setWidth(double newWidth) => width = newWidth;
@@ -692,11 +697,6 @@ class StoryPainterControl {
     }
 
     _activePath = null;
-  }
-
-  void clear() {
-    _paths.clear();
-    pageState.refreshState();
   }
 
   //TODO: Only landscape to landscape mode works correctly now. Add support for orientation switching.
