@@ -41,6 +41,24 @@ class StoryPainter extends StatelessWidget {
               onScaleUpdate: (args) => control.alterPath(args.localFocalPoint),
               onScaleEnd: (args) => control.closePath(),
             ),
+          if (control.color == Colors.transparent)
+            GestureDetector(onPanStart: (d) {
+              final press = d.localPosition;
+              final paths = control.paths;
+
+              if (control.color == Colors.transparent) {
+                loop:
+                for (var path in paths.reversed) {
+                  if (path != null)
+                    for (var point in path.points) {
+                      if (press.distanceTo(point) <= 20) {
+                        control.removePath(path);
+                        break loop;
+                      }
+                    }
+                }
+              }
+            }),
         ],
       ),
     );
