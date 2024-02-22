@@ -56,6 +56,13 @@ class _HomeState extends State<Home> {
         title: const Text('story_painter'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.cloud_off),
+            onPressed: () async {
+              painterControl.setColor(Colors.transparent);
+              setState(() {});
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.close),
             onPressed: () async {
               painterControl.clear();
