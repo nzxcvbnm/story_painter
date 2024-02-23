@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -18,6 +19,23 @@ class OffsetPoint extends Offset {
     required double dy,
     this.timestamp,
   }) : super(dx, dy);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'dx': dx,
+      'dy': dy,
+      'timestamp': timestamp,
+    };
+  }
+
+  // Named constructor to create OffsetPoint instance from a map
+  factory OffsetPoint.fromJson(Map<String, dynamic> map) {
+    return OffsetPoint(
+      dx: map['dx'],
+      dy: map['dy'],
+      timestamp: map['timestamp'],
+    );
+  }
 
   factory OffsetPoint.from(Offset offset) => OffsetPoint(
         dx: offset.dx,
@@ -103,6 +121,29 @@ class CubicLine extends Offset {
     _upEndVector = upEndVector;
     _velocity = end.velocityFrom(start);
     _distance = start.distanceTo(end);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'start': start.toJson(),
+      'cpStart': {'dx': cpStart.dx, 'dy': cpStart.dy},
+      'cpEnd': {'dx': cpEnd.dx, 'dy': cpEnd.dy},
+      'end': end.toJson(),
+      'startSize': startSize,
+      'endSize': endSize,
+    };
+  }
+
+  // Named constructor to create CubicLine instance from a JSON object
+  factory CubicLine.fromJson(Map<String, dynamic> json) {
+    return CubicLine(
+      start: OffsetPoint.fromJson(json['start']),
+      cpStart: Offset(json['cpStart']['dx'], json['cpStart']['dy']),
+      cpEnd: Offset(json['cpEnd']['dx'], json['cpEnd']['dy']),
+      end: OffsetPoint.fromJson(json['end']),
+      startSize: json['startSize'] ?? 0.0,
+      endSize: json['endSize'] ?? 0.0,
+    );
   }
 
   @override
@@ -290,6 +331,7 @@ class CubicLine extends Offset {
 class CubicArc extends Offset {
   static const rotation = math.pi * 2.0;
 
+  final Offset start;
   final Offset location;
   final double size;
 
@@ -300,10 +342,27 @@ class CubicArc extends Offset {
   Rect get rect => Rect.fromPoints(this, location);
 
   CubicArc({
-    required Offset start,
+    required this.start,
     required this.location,
     this.size = 1.0,
   }) : super(start.dx, start.dy);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'start': {'dx': start.dx, 'dy': start.dy},
+      'location': {'dx': location.dx, 'dy': location.dy},
+      'size': size,
+    };
+  }
+
+  // Named constructor to create CubicArc instance from a JSON object
+  factory CubicArc.fromJson(Map<String, dynamic> json) {
+    return CubicArc(
+      start: Offset(json['start']['dx'], json['start']['dy']),
+      location: Offset(json['location']['dx'], json['location']['dy']),
+      size: json['size'] ?? 1.0,
+    );
+  }
 
   @override
   Offset translate(double translateX, double translateY) => CubicArc(
@@ -323,9 +382,9 @@ class CubicArc extends Offset {
 class CubicPath {
   SinglePathState? pathState;
   final int id;
-  final _points = <OffsetPoint>[];
-  final _lines = <CubicLine>[];
-  final _arcs = <CubicArc>[];
+  List<OffsetPoint> _points = <OffsetPoint>[];
+  List<CubicLine> _lines = <CubicLine>[];
+  List<CubicArc> _arcs = <CubicArc>[];
 
   List<OffsetPoint> get points => _points;
 
@@ -365,6 +424,50 @@ class CubicPath {
     this.color = Colors.black,
     this.type = PainterDrawType.shape,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      '_points': _points.map((point) => point.toJson()).toList(),
+      '_lines': _lines.map((line) => line.toJson()).toList(),
+      '_arcs': _arcs.map((arc) => arc.toJson()).toList(),
+      'threshold': threshold,
+      'smoothRatio': smoothRatio,
+      'color': color.value,
+      'width': width,
+      'type': type.toString(),
+    };
+  }
+
+  PainterDrawType painterDrawType(String type) {
+    switch (type) {
+      case 'PainterDrawType.arc':
+        return PainterDrawType.arc;
+      case 'PainterDrawType.line':
+        return PainterDrawType.line;
+      case 'PainterDrawType.shape':
+        return PainterDrawType.shape;
+    }
+    return PainterDrawType.shape;
+  }
+
+  // Named constructor to create CubicPath instance from a map
+  CubicPath.fromJson(Map<String, dynamic> map)
+      : id = map['id'],
+        threshold = map['threshold'] ?? 3.0,
+        smoothRatio = map['smoothRatio'] ?? 0.65,
+        color = Color(map['color']),
+        width = map['width'],
+        type = PainterDrawType.shape,
+        _points = (map['_points'] as List<dynamic>)
+            .map((pointJson) => OffsetPoint.fromJson(pointJson))
+            .toList(),
+        _lines = (map['_lines'] as List<dynamic>)
+            .map((lineJson) => CubicLine.fromJson(lineJson))
+            .toList(),
+        _arcs = (map['_arcs'] as List<dynamic>)
+            .map((arcJson) => CubicArc.fromJson(arcJson))
+            .toList();
 
   void _addLine(CubicLine line) {
     if (_lines.length == 0) {
@@ -567,6 +670,10 @@ class StoryPainterControl {
   GlobalKey painterKey = GlobalKey();
   final _paths = <CubicPath?>[];
 
+  void addPaths(List<CubicPath> paths) {
+    _paths.addAll(paths);
+  }
+
   void undo() {
     if (_paths.isNotEmpty) {
       _paths.removeLast();
@@ -675,6 +782,17 @@ class StoryPainterControl {
 
     _paths.add(_activePath);
     pageState.add();
+  }
+
+  String getPaths() {
+    return jsonEncode(paths.map((e) => e!.toJson()).toList());
+  }
+
+  void setPaths(String? string) {
+    if (string == null) return;
+    List<dynamic> list = jsonDecode(string);
+    List<CubicPath> newPaths = list.map((e) => CubicPath.fromJson(e)).toList();
+    paths.addAll(newPaths);
   }
 
   void alterPath(Offset point) {
