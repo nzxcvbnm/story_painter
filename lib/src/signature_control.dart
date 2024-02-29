@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:story_painter/src/path_action.dart';
 
 import '../story_painter.dart';
 import 'utils.dart';
@@ -669,23 +669,44 @@ class StoryPainterControl {
   late StoryPainterPaintState pageState;
   GlobalKey painterKey = GlobalKey();
   final _paths = <CubicPath?>[];
+  final _pathActions = <PathAction>[];
 
   void addPaths(List<CubicPath> paths) {
     _paths.addAll(paths);
   }
 
   void undo() {
-    if (_paths.isNotEmpty) {
-      _paths.removeLast();
-      pageState.remove();
+    if (_pathActions.isNotEmpty) {
+      if (_pathActions.last.action == Act.add) {
+        undoRemovePath(_pathActions.last.path);
+        _pathActions.removeLast();
+        return;
+      }
+      if (_pathActions.last.action == Act.remove) {
+        undoAddPath(_pathActions.last.path);
+        _pathActions.removeLast();
+        return;
+      }
     }
+  }
+
+  void undoRemovePath(CubicPath path) {
+    int index = _paths.indexOf(path);
+    _paths.remove(path);
+    pageState.removePath(index);
+  }
+
+  void undoAddPath(CubicPath path) {
+    _paths.add(path);
+    pageState.add();
   }
 
   void removePath(CubicPath path) {
     int index = _paths.indexOf(path);
     _paths.remove(path);
-
     pageState.removePath(index);
+
+    _pathActions.add(PathAction(path: path, action: Act.remove));
   }
 
   void clear() {
@@ -782,6 +803,8 @@ class StoryPainterControl {
 
     _paths.add(_activePath);
     pageState.add();
+
+    _pathActions.add(PathAction(path: _activePath!, action: Act.add));
   }
 
   String getPaths() {
