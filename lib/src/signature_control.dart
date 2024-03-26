@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -807,14 +808,20 @@ class StoryPainterControl {
     _pathActions.add(PathAction(path: _activePath!, action: Act.add));
   }
 
-  String getPaths() {
-    return jsonEncode(paths.map((e) => e!.toJson()).toList());
+  List<int> getPaths() {
+    final String json = jsonEncode(paths.map((e) => e!.toJson()).toList());
+    final List<int> jsonData = utf8.encode(json);
+    final List<int> compressedData = gzip.encode(jsonData);
+    return compressedData;
   }
 
-  void setPaths(String? string) {
-    if (string == null) return;
-    List<dynamic> list = jsonDecode(string);
-    List<CubicPath> newPaths = list.map((e) => CubicPath.fromJson(e)).toList();
+  void setPaths(List<int>? compressed) {
+    if (compressed == null) return;
+    final List<int> decompressed = gzip.decode(compressed);
+    final String json = utf8.decode(decompressed);
+    final List<dynamic> decodedList = jsonDecode(json);
+    final List<CubicPath> newPaths =
+        decodedList.map((e) => CubicPath.fromJson(e)).toList();
     paths.addAll(newPaths);
   }
 
