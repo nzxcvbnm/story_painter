@@ -820,19 +820,20 @@ class StoryPainterControl {
   }
 
   List<int> getCompressedPaths() {
-    final pathsAsString = jsonEncode(paths.map((e) => e!.toJson()).toList());
-    final encoded = utf8.encode(pathsAsString);
+    final jsonList = paths.map((e) => e!.toJson()).toList();
+    final string = jsonEncode(jsonList);
+    final encoded = utf8.encode(string);
     final compressed = gzip.encode(encoded);
     return compressed;
   }
 
   void setCompressedPaths(List<int> compressed) {
-    final decoded = gzip.decode(compressed);
-    final pathsAsString = utf8.decode(decoded);
-    final List<CubicPath> list = jsonDecode(pathsAsString)
-        .map((item) => CubicPath.fromJson(item))
-        .toList();
-    paths.addAll(list);
+    final List<int> decompressed = gzip.decode(compressed);
+    final String json = utf8.decode(decompressed);
+    final List<dynamic> decodedList = jsonDecode(json);
+    final List<CubicPath> newPaths =
+        decodedList.map((e) => CubicPath.fromJson(e)).toList();
+    paths.addAll(newPaths);
   }
 
   void alterPath(Offset point) {
