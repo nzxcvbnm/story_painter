@@ -829,10 +829,10 @@ class StoryPainterControl {
   void setCompressedPaths(List<int> compressed) {
     final decoded = gzip.decode(compressed);
     final pathsAsString = utf8.decode(decoded);
-    final pathsList = jsonDecode(pathsAsString)
+    final List<CubicPath> list = jsonDecode(pathsAsString)
         .map((item) => CubicPath.fromJson(item))
         .toList();
-    paths.addAll(pathsList);
+    paths.addAll(list);
   }
 
   void alterPath(Offset point) {
