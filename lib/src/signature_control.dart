@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:story_painter/src/dictionary.dart';
 import 'package:story_painter/src/path_action.dart';
 
 import '../story_painter.dart';
@@ -22,18 +23,18 @@ class OffsetPoint extends Offset {
 
   Map<String, dynamic> toJson() {
     return {
-      'dx': dx,
-      'dy': dy,
-      'timestamp': timestamp,
+      dx_: dx,
+      dy_: dy,
+      timestamp_: timestamp,
     };
   }
 
   // Named constructor to create OffsetPoint instance from a map
   factory OffsetPoint.fromJson(Map<String, dynamic> map) {
     return OffsetPoint(
-      dx: map['dx'],
-      dy: map['dy'],
-      timestamp: map['timestamp'],
+      dx: map[dx_],
+      dy: map[dy_],
+      timestamp: map[timestamp_],
     );
   }
 
@@ -125,24 +126,24 @@ class CubicLine extends Offset {
 
   Map<String, dynamic> toJson() {
     return {
-      'start': start.toJson(),
-      'cpStart': {'dx': cpStart.dx, 'dy': cpStart.dy},
-      'cpEnd': {'dx': cpEnd.dx, 'dy': cpEnd.dy},
-      'end': end.toJson(),
-      'startSize': startSize,
-      'endSize': endSize,
+      start_: start.toJson(),
+      cpStart_: {dx_: cpStart.dx, dy_: cpStart.dy},
+      cpEnd_: {dx_: cpEnd.dx, dy_: cpEnd.dy},
+      end_: end.toJson(),
+      startSize_: startSize,
+      endSize_: endSize,
     };
   }
 
   // Named constructor to create CubicLine instance from a JSON object
   factory CubicLine.fromJson(Map<String, dynamic> json) {
     return CubicLine(
-      start: OffsetPoint.fromJson(json['start']),
-      cpStart: Offset(json['cpStart']['dx'], json['cpStart']['dy']),
-      cpEnd: Offset(json['cpEnd']['dx'], json['cpEnd']['dy']),
-      end: OffsetPoint.fromJson(json['end']),
-      startSize: json['startSize'] ?? 0.0,
-      endSize: json['endSize'] ?? 0.0,
+      start: OffsetPoint.fromJson(json[start_]),
+      cpStart: Offset(json[cpStart_][dx_], json[cpStart_][dy_]),
+      cpEnd: Offset(json[cpEnd_][dx_], json[cpEnd_][dy_]),
+      end: OffsetPoint.fromJson(json[end_]),
+      startSize: json[startSize_] ?? 0.0,
+      endSize: json[endSize_] ?? 0.0,
     );
   }
 
@@ -349,18 +350,18 @@ class CubicArc extends Offset {
 
   Map<String, dynamic> toJson() {
     return {
-      'start': {'dx': start.dx, 'dy': start.dy},
-      'location': {'dx': location.dx, 'dy': location.dy},
-      'size': size,
+      start_: {dx_: start.dx, dy_: start.dy},
+      location_: {dx_: location.dx, dy_: location.dy},
+      size_: size,
     };
   }
 
   // Named constructor to create CubicArc instance from a JSON object
   factory CubicArc.fromJson(Map<String, dynamic> json) {
     return CubicArc(
-      start: Offset(json['start']['dx'], json['start']['dy']),
-      location: Offset(json['location']['dx'], json['location']['dy']),
-      size: json['size'] ?? 1.0,
+      start: Offset(json[start_][dx_], json[start_][dy_]),
+      location: Offset(json[location_][dx_], json[location_][dy_]),
+      size: json[size_] ?? 1.0,
     );
   }
 
@@ -427,25 +428,25 @@ class CubicPath {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      '_points': _points.map((point) => point.toJson()).toList(),
-      '_lines': _lines.map((line) => line.toJson()).toList(),
-      '_arcs': _arcs.map((arc) => arc.toJson()).toList(),
-      'threshold': threshold,
-      'smoothRatio': smoothRatio,
-      'color': color.value,
-      'width': width,
-      'type': type.toString(),
+      id_: id,
+      points_: _points.map((point) => point.toJson()).toList(),
+      lines_: _lines.map((line) => line.toJson()).toList(),
+      arcs_: _arcs.map((arc) => arc.toJson()).toList(),
+      threshold_: threshold,
+      smoothRatio_: smoothRatio,
+      color_: color.value,
+      width_: width,
+      type_: type.toString(),
     };
   }
 
   PainterDrawType painterDrawType(String type) {
     switch (type) {
-      case 'PainterDrawType.arc':
+      case painterDrawTypeArc:
         return PainterDrawType.arc;
-      case 'PainterDrawType.line':
+      case painterDrawTypeLine:
         return PainterDrawType.line;
-      case 'PainterDrawType.shape':
+      case painterDrawTypeShape:
         return PainterDrawType.shape;
     }
     return PainterDrawType.shape;
@@ -453,19 +454,19 @@ class CubicPath {
 
   // Named constructor to create CubicPath instance from a map
   CubicPath.fromJson(Map<String, dynamic> map)
-      : id = map['id'],
-        threshold = map['threshold'] ?? 3.0,
-        smoothRatio = map['smoothRatio'] ?? 0.65,
-        color = Color(map['color']),
-        width = map['width'],
+      : id = map[id_],
+        threshold = map[threshold_] ?? 3.0,
+        smoothRatio = map[smoothRatio_] ?? 0.65,
+        color = Color(map[color_]),
+        width = map[width_],
         type = PainterDrawType.shape,
-        _points = (map['_points'] as List<dynamic>)
+        _points = (map[points_] as List<dynamic>)
             .map((pointJson) => OffsetPoint.fromJson(pointJson))
             .toList(),
-        _lines = (map['_lines'] as List<dynamic>)
+        _lines = (map[lines_] as List<dynamic>)
             .map((lineJson) => CubicLine.fromJson(lineJson))
             .toList(),
-        _arcs = (map['_arcs'] as List<dynamic>)
+        _arcs = (map[arcs_] as List<dynamic>)
             .map((arcJson) => CubicArc.fromJson(arcJson))
             .toList();
 
