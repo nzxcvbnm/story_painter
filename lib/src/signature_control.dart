@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -816,23 +815,6 @@ class StoryPainterControl {
     if (string == null) return;
     List<dynamic> list = jsonDecode(string);
     List<CubicPath> newPaths = list.map((e) => CubicPath.fromJson(e)).toList();
-    paths.addAll(newPaths);
-  }
-
-  List<int> getCompressedPaths() {
-    final jsonList = paths.map((e) => e!.toJson()).toList();
-    final string = jsonEncode(jsonList);
-    final encoded = utf8.encode(string);
-    final compressed = gzip.encode(encoded);
-    return compressed;
-  }
-
-  void setCompressedPaths(List<int> compressed) {
-    final List<int> decompressed = gzip.decode(compressed);
-    final String json = utf8.decode(decompressed);
-    final List<dynamic> decodedList = jsonDecode(json);
-    final List<CubicPath> newPaths =
-        decodedList.map((e) => CubicPath.fromJson(e)).toList();
     paths.addAll(newPaths);
   }
 

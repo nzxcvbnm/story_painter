@@ -51,7 +51,7 @@ class StoryPainter extends StatelessWidget {
                 for (var path in paths.reversed) {
                   if (path != null)
                     for (var point in path.points) {
-                      if (press.distanceTo(point) <= 20) {
+                      if (press.distanceTo(point) <= path.width / 2) {
                         control.removePath(path);
                         break loop;
                       }
