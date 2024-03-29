@@ -436,17 +436,30 @@ class CubicPath {
       smoothRatio_: smoothRatio,
       color_: color.value,
       width_: width,
-      type_: type.toString(),
+      type_: painterDrawTypeEncoded(type),
     };
+  }
+
+  String painterDrawTypeEncoded(PainterDrawType type) {
+    switch (type) {
+      case PainterDrawType.arc:
+        return painterDrawTypeArc_;
+      case PainterDrawType.line:
+        return painterDrawTypeLine_;
+      case PainterDrawType.shape:
+        return painterDrawTypeShape_;
+      default:
+        return painterDrawTypeShape_;
+    }
   }
 
   PainterDrawType painterDrawType(String type) {
     switch (type) {
-      case painterDrawTypeArc:
+      case painterDrawTypeArc_:
         return PainterDrawType.arc;
-      case painterDrawTypeLine:
+      case painterDrawTypeLine_:
         return PainterDrawType.line;
-      case painterDrawTypeShape:
+      case painterDrawTypeShape_:
         return PainterDrawType.shape;
     }
     return PainterDrawType.shape;

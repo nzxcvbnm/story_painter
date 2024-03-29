@@ -36,10 +36,10 @@ const width_ = 'u';
 
 const type_ = 'w';
 
-const painterDrawTypeArc = 'x';
+const painterDrawTypeArc_ = 'x';
 
-const painterDrawTypeLine = 'y';
+const painterDrawTypeLine_ = 'y';
 
-const painterDrawTypeShape = 'z';
+const painterDrawTypeShape_ = 'z';
 
 const start_ = 'd';
